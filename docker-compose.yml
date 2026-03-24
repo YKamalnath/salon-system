@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: salon-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: salon_db
+      POSTGRES_USER: salon_user
+      POSTGRES_PASSWORD: salon_password
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: salon-backend
+    restart: unless-stopped
+    environment:
+      PORT: 5000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: salon_db
+      DB_USER: salon_user
+      DB_PASSWORD: salon_password
+    ports:
+      - '5000:5000'
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
